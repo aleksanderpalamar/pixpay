@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -26,4 +27,17 @@ func getPostgresConnectionString() string {
 
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, post, user, password, dbname)
+}
+
+func runMigrations(db *sql.DB) error {
+	file, err := os.ReadFile("scripts/init.sql")
+	if err != nil {
+		return fmt.Errorf("could not read init.sql file: %v", err)
+	}
+	_, err = db.Exec(string(file))
+	if err != nil {
+		return fmt.Errorf("could not execute migrations: %v", err)
+	}
+	log.Println("Database migrations executed successfully")
+	return nil
 }
