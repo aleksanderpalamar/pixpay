@@ -4,23 +4,27 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aleksanderpalamar/pixpay/internal/database"
-	"github.com/aleksanderpalamar/pixpay/internal/pix"
+	"github.com/aleksanderpalamar/pixpay/config"
 
+	"github.com/aleksanderpalamar/pixpay/internal/router"
+	"github.com/aleksanderpalamar/pixpay/pkg/database"
+	"github.com/aleksanderpalamar/pixpay/pkg/logger"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db := database.Connect()
+	config.Load()
+	logger.InitLogger()
+
+	db, err := database.InitPostgres()
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
+	}
 	defer db.Close()
 
-	pixService := pix.NewPixService(db)
-	pixHandler := pix.NewPixHandler(pixService)
+	router := router.NewRouter(db)
+	http.Handle("/", router)
 
-	http.HandleFunc("/payments", pixHandler.CreatePayment)
-
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatalf("Could not start server: %v\n", err)
-	}
+	log.Println("Starting server on port 8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
