@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS payments (
+  id SERIAL PRIMARY KEY,
+  amount DECIMAL(10, 2) NOT NULL,
+  description TEXT NOT NULL,
+  receiver VARCHAR(255) NOT NULL
+)
