@@ -80,6 +80,7 @@ func (s *Service) UpdatePayment(payment *Payment) error {
 	}
 
 	payment.UpdatedAt = time.Now()
+
 	err := s.repository.Update(payment)
 	if err != nil {
 		return err
