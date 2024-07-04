@@ -1,127 +1,99 @@
-# PixPay - Payment Gateway for Pix
+# PixPay Gateway
 
-This project is a Payment API developed using Golang. The API supports payment transactions using the Pix system and uses PostgreSQL as its database.
+## Descrição
+PixPay Gateway é uma API Gateway para processamento de pagamentos utilizando Pix. Esta aplicação é construída com Golang e o framework Gin, e utiliza PostgreSQL como banco de dados, Docker para containerização e Terraform para gerenciar a infraestrutura.
 
-## Project Structure
+## Funcionalidades
+1. **Roteamento de Solicitações**: Encaminha solicitações dos clientes para o serviço apropriado no backend e facilita o balanceamento de carga.
+2. **Autenticação e Autorização**: Verifica se as solicitações são autenticadas e autorizadas antes de encaminhá-las para os serviços internos.
+3. **Agregação de Respostas**: Combina respostas de múltiplos serviços backend em uma única resposta para o cliente.
+4. **Transformação de Mensagens**: Modifica as solicitações e respostas conforme necessário (ex.: transformação de formatos de dados, adição/removal de cabeçalhos).
+5. **Gerenciamento de Taxas (Rate Limiting)**: Controla o número de solicitações que um cliente pode fazer em um determinado período para prevenir abuso e sobrecarga do sistema.
+6. **Monitoramento e Logging**: Coleta métricas e logs das solicitações para monitoramento, análise e troubleshooting.
+7. **Cache**: Armazena em cache as respostas de serviços backend para melhorar o desempenho e reduzir a carga nos serviços.
 
-```bash
-/pixpay
-|-- /cmd
-|   |-- /api
-|       |-- main.go
-|-- /config
-|   |-- config.go
-|-- /internal
-|   |-- /api
-|   |   |-- /handler
-|   |   |   |-- payment_handler.go
-|   |   |-- /router
-|   |       |-- router.go
-|   |-- /core
-|   |   |-- /payment
-|   |       |-- payment.go
-|   |-- /repository
-|       |-- /postgres
-|           |-- payment_repository.go
-|-- /pkg
-|   |-- /database
-|   |   |-- postgres.go
-|   |-- /logger
-|       |-- logger.go
-|-- go.mod
-|-- go.sum
+## Estrutura do Projeto
+
+```shell
+pixpay-gateway/
+├── api/
+│ ├── handlers/
+│ ├── middleware/
+│ ├── routes/
+│ └── main.go
+├── config/
+│ ├── config.go
+│ └── config.yaml
+├── db/
+│ ├── migrations/
+│ └── db.go
+├── docker/
+│ ├── Dockerfile
+│ ├── docker-compose.yaml
+├── scripts/
+│ └── init.sql
+├── terraform/
+│ ├── main.tf
+│ ├── variables.tf
+│ └── outputs.tf
+├── .env
+├── go.mod
+├── go.sum
+└── README.md
 ```
 
-## Getting Started
+## Requisitos
+- Go 1.22+
+- Docker
+- Docker Compose
+- Terraform
+- PostgreSQL
 
-**Prerequisites**
+## Configuração
+### Banco de Dados
+1. Crie o banco de dados PostgreSQL utilizando o script `scripts/init.sql`.
+2. Configure as variáveis de ambiente no arquivo `.env` com as credenciais do banco de dados.
 
-- [Go](https://golang.org/doc/install)
-- [Docker](https://docs.docker.com/get-docker/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Go Modules](https://blog.golang.org/using-go-modules)
-
-**Installation**
-
-1. Clone the repository
-
+### Docker
+1. Construa e inicie os containers:
    ```bash
-   git clone https://github.com/aleksanderpalamar/pixpay.git
+   docker-compose up --build
    ```
-2. Install dependencies
-
+2. Acesse o servidor Docker:
    ```bash
-   go mod download
+   docker-compose exec pixpay-gateway bash
    ```
-   or
+3. Inicie o serviço:
    ```bash
-   go mod tidy
+   go run cmd/api/main.go
    ```
-3. Set up envirenment variables:
+### Terraform
+1. Inicialize o Terraform:
+   ```bash
+   terraform init
+   ```
+2. Configure as variáveis de ambiente no arquivo `terraform/variables.tf`.
+3. Execute o Terraform:
+   ```bash
+   terraform apply
+   ```
 
-Create a `.env` file in the root directory of the project and add the following variables:
+## Comandos
 
+### Criar Banco de Dados
 ```bash
-DB_HOST=
-DB_PORT=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
+docker-compose exec pixpay-gateway psql -U postgres -d postgres -f scripts/init.sql
 ```
 
-4. Run the application
-
+### Iniciar Servidor
 ```bash
 go run cmd/api/main.go
 ```
 
-5. Using Docker
-
+### Iniciar Servidor Docker
 ```bash
-docker compose up --build
+docker-compose exec pixpay-gateway go run cmd/api/main.go
 ```
 
-### Directory Structure
-
-- `cmd`: Contains the entry point for the application.
-- `config`: Configuration files for and variables handling.
-- `internal`: Internal application code, not exposed outside the module.
-  - `api`: API related code (handlers, routers, etc.).
-  - `core`: Core business logic.
-  - `repository`: Database access code.
-- `pkg`: Reusable packages and utilities.
-  - `database`: Database initialization and configuration.
-  - `logger`: Logger initialization and configuration.
-
-## API Endpoints
-
-- Create Payment
-  - URL: `/payments`
-  - Method: `POST`
-  - Description: Creates a new payment.
-- Get Payment
-  - URL: `/payments/:id`
-  - Method: `GET`
-  - Description: Retrieves a payment by its ID.
-
-### Example Request
-
-- Create Payment
-
-```bash	
-curl -X POST http://localhost:8080/payments -H "Content-Type: application/json" -d '{"amount": 100, "recipient": "recipient_id"}'
-```
-
-- Get Payment
-
-```bash
-curl http://localhost:8080/payments/{id}
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
-
-
+## Licença
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para obter detalhes.
