@@ -18,8 +18,15 @@ PixPay Gateway é uma API Gateway para processamento de pagamentos utilizando Pi
 pixpay-gateway/
 ├── api/
 │ ├── handlers/
+│ │   ├── handlers.go
+│ │   ├── aggregate.go
 │ ├── middleware/
+│ │   ├── cache.go
+│ │   ├── rate_limit.go
+│ │   ├── middleware.go
+│ │   ├── logger.go
 │ ├── routes/
+│ │   ├── routes.go
 │ └── main.go
 ├── config/
 │ ├── config.go
