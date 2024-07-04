@@ -7,18 +7,14 @@ import (
 	"github.com/aleksanderpalamar/pixpay/api/middleware"
 )
 
-func SetuoRouter() *gin.Engine {
-	router := gin.Default()
+func SetupRouter(r *gin.Engine) {
+	r.Use(middleware.RateLimitMiddleware())
+	r.Use(middleware.CacheMiddleware())
+	r.Use(middleware.LoggerMiddleware())
 
-	// Middleware
-	router.Use(middleware.AuthMiddleware())
-
-	// Routes
-	router.GET("/payments", handlers.GetPayments)
-	router.POST("/payments", handlers.CreatePayment)
-	router.GET("/payments/:id", handlers.GetPaymentByID)
-	router.PUT("/payments/:id", handlers.UpdatePayment)
-	router.DELETE("/payments/:id", handlers.DeletePayment)
-
-	return router
+	r.GET("/payments", handlers.GetPayments)
+	r.POST("/payments", handlers.CreatePayment)
+	r.GET("/payments/:id", handlers.GetPaymentByID)
+	r.PUT("/payments/:id", handlers.UpdatePayment)
+	r.DELETE("/payments/:id", handlers.DeletePayment)
 }
